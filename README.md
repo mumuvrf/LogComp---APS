@@ -33,13 +33,18 @@ Por fim: Essa explicação faz sentido de forma consistente?
 ```
 Program        = { Statement } ;
 
-Statement      = Question | Answer | SubQuestion | Branch | Conclusion ;
+Statement      = Question | Answer | SubQuestion | Branch | Conclusion | Loop ;
 
 Question       = "?" , Text ;
 SubQuestion    = "??" , Text ;
 Answer         = ">" , Text ;
 Branch         = "->" , "Se" , Condition , ":" , { Statement } ;
-Conclusion     = "✔" , Text ;
+Conclusion     = "!" , Text ;
+
+Loop           = EnquantoLoop | RepetirLoop ;
+
+EnquantoLoop   = "Enquanto" , Condition , ":" , { Statement } ;
+RepetirLoop    = "Repetir" , Text , "vezes:" , { Statement } ;
 
 Condition      = Text ;
 
@@ -60,17 +65,23 @@ Character      = ? qualquer caractere exceto quebra de linha ? ;
 
 - **Branch (-> Se ...)** → representa caminhos diferentes de raciocínio.
 
+- **Loop (Enquanto ...: | Repetir ... vezes:)** → representa o uso de repetição de perguntas para aprofundamento do raciocínio.
+
 - **Conclusion (!)** → marca uma síntese, mesmo que temporária.
 
 ### Exemplo
 
 ```
-? O que é energia?
-> É a capacidade de realizar trabalho.
-?? O que é trabalho?
-> Força aplicada sobre uma distância.
--> Se trabalho = força x distância:
-     ? Como medir força?
-     > Pela aceleração e massa.
-✔ Entendi a relação entre energia e trabalho.
+? O que é justiça?
+> "Dar a cada um o que é seu."
+Enquanto sentir_incerteza == True:
+    ?? Isso vale para todos os casos?
+    > "Talvez não, depende das circunstâncias."
+    ?? Então o que é 'seu'?
+    > "O que lhe é devido, mas o que é devido?"
+    -> Se não há resposta consistente:
+         > sentir_incerteza = True
+    -> Se a definição parece coerente:
+         > sentir_incerteza = False
+! Cheguei a uma formulação mais madura (ainda provisória).
 ```
