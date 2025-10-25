@@ -1,0 +1,395 @@
+State 24 conflicts: 11 reduce/reduce
+State 25 conflicts: 11 reduce/reduce
+State 26 conflicts: 11 reduce/reduce
+
+
+Grammar
+
+    0 $accept: program $end
+
+    1 program: ε
+    2        | program statement
+
+    3 statement: QUESTION
+    4          | SUBQUESTION
+    5          | ANSWER
+    6          | CONCLUSION
+
+    7 $@1: ε
+
+    8 statement: BRANCH INDENT $@1 program DEDENT
+
+    9 $@2: ε
+
+   10 statement: WHILE INDENT $@2 program DEDENT
+
+   11 $@3: ε
+
+   12 statement: REPEAT INDENT $@3 program DEDENT
+   13          | TEXT
+   14          | INDENT
+   15          | DEDENT
+   16          | NEWLINE
+
+
+Terminals, with rules where they appear
+
+    $end (0) 0
+    error (256)
+    QUESTION <s> (258) 3
+    SUBQUESTION <s> (259) 4
+    ANSWER <s> (260) 5
+    BRANCH <s> (261) 8
+    WHILE <s> (262) 10
+    REPEAT <s> (263) 12
+    CONCLUSION <s> (264) 6
+    TEXT <s> (265) 13
+    INDENT (266) 8 10 12 14
+    DEDENT (267) 8 10 12 15
+    NEWLINE (268) 16
+
+
+Nonterminals, with rules where they appear
+
+    $accept (14)
+        on left: 0
+    program (15)
+        on left: 1 2
+        on right: 0 2 8 10 12
+    statement (16)
+        on left: 3 4 5 6 8 10 12 13 14 15 16
+        on right: 2
+    $@1 (17)
+        on left: 7
+        on right: 8
+    $@2 (18)
+        on left: 9
+        on right: 10
+    $@3 (19)
+        on left: 11
+        on right: 12
+
+
+State 0
+
+    0 $accept: • program $end
+
+    $default  reduce using rule 1 (program)
+
+    program  go to state 1
+
+
+State 1
+
+    0 $accept: program • $end
+    2 program: program • statement
+
+    $end         shift, and go to state 2
+    QUESTION     shift, and go to state 3
+    SUBQUESTION  shift, and go to state 4
+    ANSWER       shift, and go to state 5
+    BRANCH       shift, and go to state 6
+    WHILE        shift, and go to state 7
+    REPEAT       shift, and go to state 8
+    CONCLUSION   shift, and go to state 9
+    TEXT         shift, and go to state 10
+    INDENT       shift, and go to state 11
+    DEDENT       shift, and go to state 12
+    NEWLINE      shift, and go to state 13
+
+    statement  go to state 14
+
+
+State 2
+
+    0 $accept: program $end •
+
+    $default  accept
+
+
+State 3
+
+    3 statement: QUESTION •
+
+    $default  reduce using rule 3 (statement)
+
+
+State 4
+
+    4 statement: SUBQUESTION •
+
+    $default  reduce using rule 4 (statement)
+
+
+State 5
+
+    5 statement: ANSWER •
+
+    $default  reduce using rule 5 (statement)
+
+
+State 6
+
+    8 statement: BRANCH • INDENT $@1 program DEDENT
+
+    INDENT  shift, and go to state 15
+
+
+State 7
+
+   10 statement: WHILE • INDENT $@2 program DEDENT
+
+    INDENT  shift, and go to state 16
+
+
+State 8
+
+   12 statement: REPEAT • INDENT $@3 program DEDENT
+
+    INDENT  shift, and go to state 17
+
+
+State 9
+
+    6 statement: CONCLUSION •
+
+    $default  reduce using rule 6 (statement)
+
+
+State 10
+
+   13 statement: TEXT •
+
+    $default  reduce using rule 13 (statement)
+
+
+State 11
+
+   14 statement: INDENT •
+
+    $default  reduce using rule 14 (statement)
+
+
+State 12
+
+   15 statement: DEDENT •
+
+    $default  reduce using rule 15 (statement)
+
+
+State 13
+
+   16 statement: NEWLINE •
+
+    $default  reduce using rule 16 (statement)
+
+
+State 14
+
+    2 program: program statement •
+
+    $default  reduce using rule 2 (program)
+
+
+State 15
+
+    8 statement: BRANCH INDENT • $@1 program DEDENT
+
+    $default  reduce using rule 7 ($@1)
+
+    $@1  go to state 18
+
+
+State 16
+
+   10 statement: WHILE INDENT • $@2 program DEDENT
+
+    $default  reduce using rule 9 ($@2)
+
+    $@2  go to state 19
+
+
+State 17
+
+   12 statement: REPEAT INDENT • $@3 program DEDENT
+
+    $default  reduce using rule 11 ($@3)
+
+    $@3  go to state 20
+
+
+State 18
+
+    8 statement: BRANCH INDENT $@1 • program DEDENT
+
+    $default  reduce using rule 1 (program)
+
+    program  go to state 21
+
+
+State 19
+
+   10 statement: WHILE INDENT $@2 • program DEDENT
+
+    $default  reduce using rule 1 (program)
+
+    program  go to state 22
+
+
+State 20
+
+   12 statement: REPEAT INDENT $@3 • program DEDENT
+
+    $default  reduce using rule 1 (program)
+
+    program  go to state 23
+
+
+State 21
+
+    2 program: program • statement
+    8 statement: BRANCH INDENT $@1 program • DEDENT
+
+    QUESTION     shift, and go to state 3
+    SUBQUESTION  shift, and go to state 4
+    ANSWER       shift, and go to state 5
+    BRANCH       shift, and go to state 6
+    WHILE        shift, and go to state 7
+    REPEAT       shift, and go to state 8
+    CONCLUSION   shift, and go to state 9
+    TEXT         shift, and go to state 10
+    INDENT       shift, and go to state 11
+    DEDENT       shift, and go to state 24
+    NEWLINE      shift, and go to state 13
+
+    statement  go to state 14
+
+
+State 22
+
+    2 program: program • statement
+   10 statement: WHILE INDENT $@2 program • DEDENT
+
+    QUESTION     shift, and go to state 3
+    SUBQUESTION  shift, and go to state 4
+    ANSWER       shift, and go to state 5
+    BRANCH       shift, and go to state 6
+    WHILE        shift, and go to state 7
+    REPEAT       shift, and go to state 8
+    CONCLUSION   shift, and go to state 9
+    TEXT         shift, and go to state 10
+    INDENT       shift, and go to state 11
+    DEDENT       shift, and go to state 25
+    NEWLINE      shift, and go to state 13
+
+    statement  go to state 14
+
+
+State 23
+
+    2 program: program • statement
+   12 statement: REPEAT INDENT $@3 program • DEDENT
+
+    QUESTION     shift, and go to state 3
+    SUBQUESTION  shift, and go to state 4
+    ANSWER       shift, and go to state 5
+    BRANCH       shift, and go to state 6
+    WHILE        shift, and go to state 7
+    REPEAT       shift, and go to state 8
+    CONCLUSION   shift, and go to state 9
+    TEXT         shift, and go to state 10
+    INDENT       shift, and go to state 11
+    DEDENT       shift, and go to state 26
+    NEWLINE      shift, and go to state 13
+
+    statement  go to state 14
+
+
+State 24
+
+    8 statement: BRANCH INDENT $@1 program DEDENT •
+   15          | DEDENT •
+
+    QUESTION     reduce using rule 8 (statement)
+    QUESTION     [reduce using rule 15 (statement)]
+    SUBQUESTION  reduce using rule 8 (statement)
+    SUBQUESTION  [reduce using rule 15 (statement)]
+    ANSWER       reduce using rule 8 (statement)
+    ANSWER       [reduce using rule 15 (statement)]
+    BRANCH       reduce using rule 8 (statement)
+    BRANCH       [reduce using rule 15 (statement)]
+    WHILE        reduce using rule 8 (statement)
+    WHILE        [reduce using rule 15 (statement)]
+    REPEAT       reduce using rule 8 (statement)
+    REPEAT       [reduce using rule 15 (statement)]
+    CONCLUSION   reduce using rule 8 (statement)
+    CONCLUSION   [reduce using rule 15 (statement)]
+    TEXT         reduce using rule 8 (statement)
+    TEXT         [reduce using rule 15 (statement)]
+    INDENT       reduce using rule 8 (statement)
+    INDENT       [reduce using rule 15 (statement)]
+    DEDENT       reduce using rule 8 (statement)
+    DEDENT       [reduce using rule 15 (statement)]
+    NEWLINE      reduce using rule 8 (statement)
+    NEWLINE      [reduce using rule 15 (statement)]
+    $default     reduce using rule 8 (statement)
+
+
+State 25
+
+   10 statement: WHILE INDENT $@2 program DEDENT •
+   15          | DEDENT •
+
+    QUESTION     reduce using rule 10 (statement)
+    QUESTION     [reduce using rule 15 (statement)]
+    SUBQUESTION  reduce using rule 10 (statement)
+    SUBQUESTION  [reduce using rule 15 (statement)]
+    ANSWER       reduce using rule 10 (statement)
+    ANSWER       [reduce using rule 15 (statement)]
+    BRANCH       reduce using rule 10 (statement)
+    BRANCH       [reduce using rule 15 (statement)]
+    WHILE        reduce using rule 10 (statement)
+    WHILE        [reduce using rule 15 (statement)]
+    REPEAT       reduce using rule 10 (statement)
+    REPEAT       [reduce using rule 15 (statement)]
+    CONCLUSION   reduce using rule 10 (statement)
+    CONCLUSION   [reduce using rule 15 (statement)]
+    TEXT         reduce using rule 10 (statement)
+    TEXT         [reduce using rule 15 (statement)]
+    INDENT       reduce using rule 10 (statement)
+    INDENT       [reduce using rule 15 (statement)]
+    DEDENT       reduce using rule 10 (statement)
+    DEDENT       [reduce using rule 15 (statement)]
+    NEWLINE      reduce using rule 10 (statement)
+    NEWLINE      [reduce using rule 15 (statement)]
+    $default     reduce using rule 10 (statement)
+
+
+State 26
+
+   12 statement: REPEAT INDENT $@3 program DEDENT •
+   15          | DEDENT •
+
+    QUESTION     reduce using rule 12 (statement)
+    QUESTION     [reduce using rule 15 (statement)]
+    SUBQUESTION  reduce using rule 12 (statement)
+    SUBQUESTION  [reduce using rule 15 (statement)]
+    ANSWER       reduce using rule 12 (statement)
+    ANSWER       [reduce using rule 15 (statement)]
+    BRANCH       reduce using rule 12 (statement)
+    BRANCH       [reduce using rule 15 (statement)]
+    WHILE        reduce using rule 12 (statement)
+    WHILE        [reduce using rule 15 (statement)]
+    REPEAT       reduce using rule 12 (statement)
+    REPEAT       [reduce using rule 15 (statement)]
+    CONCLUSION   reduce using rule 12 (statement)
+    CONCLUSION   [reduce using rule 15 (statement)]
+    TEXT         reduce using rule 12 (statement)
+    TEXT         [reduce using rule 15 (statement)]
+    INDENT       reduce using rule 12 (statement)
+    INDENT       [reduce using rule 15 (statement)]
+    DEDENT       reduce using rule 12 (statement)
+    DEDENT       [reduce using rule 15 (statement)]
+    NEWLINE      reduce using rule 12 (statement)
+    NEWLINE      [reduce using rule 15 (statement)]
+    $default     reduce using rule 12 (statement)
