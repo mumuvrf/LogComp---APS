@@ -9,9 +9,25 @@
 #include <cmath>
 #include <algorithm>
 #include <iomanip>
+#include <ostream>
 
 struct Value;
 using ValueList = std::vector<Value>;
+
+// Helpers para geração de código ASM
+inline int nextLabelId() {
+    static int current = 0;
+    return current++;
+}
+
+inline std::string escapeString(const std::string& s) {
+    std::string out;
+    for (char c : s) {
+        if (c == '"' || c == '\\') out.push_back('\\');
+        out.push_back(c);
+    }
+    return out;
+}
 
 struct Value {
     enum Type { NIL, BOOL, NUMBER, STRING, LIST } type;
@@ -25,10 +41,7 @@ struct Value {
     Value(bool b) : type(BOOL), boolVal(b), numVal(0) {}
     Value(double n) : type(NUMBER), numVal(n), boolVal(false) {}
     Value(const std::string& s) : type(STRING), strVal(s), numVal(0), boolVal(false) {}
-    
-    // --- ESTE CONSTRUTOR É ESSENCIAL ---
     Value(const char* s) : type(STRING), strVal(s), numVal(0), boolVal(false) {}
-
     Value(ValueList l) : type(LIST), listVal(std::make_shared<ValueList>(l)), numVal(0), boolVal(false) {}
 
     std::string toString() const {
@@ -36,7 +49,7 @@ struct Value {
         if (type == NUMBER) {
             std::string s = std::to_string(numVal);
             s.erase(s.find_last_not_of('0') + 1, std::string::npos);
-            if (s.back() == '.') s.pop_back();
+            if (!s.empty() && s.back() == '.') s.pop_back();
             return s;
         }
         if (type == STRING) return strVal;
@@ -59,16 +72,42 @@ inline std::map<std::string, Value> globals;
 class Node {
 public:
     virtual ~Node() = default;
-    virtual Value execute() = 0;
+    virtual Value execute() = 0;                 // interpretador
+    virtual void generate(std::ostream& out) = 0; // compilador para ASM
 };
 
 class Expression : public Node {};
+
+// -------------------- Literais, variáveis e listas --------------------
 
 class Literal : public Expression {
     Value val;
 public:
     Literal(Value v) : val(v) {}
     Value execute() override { return val; }
+
+    void generate(std::ostream& out) override {
+        switch (val.type) {
+        case Value::BOOL:
+            out << "PUSH_BOOL " << (val.boolVal ? 1 : 0) << "\n";
+            break;
+        case Value::NUMBER:
+            out << "PUSH_NUM " << std::setprecision(15) << val.numVal << "\n";
+            break;
+        case Value::STRING:
+            out << "PUSH_STR \"" << escapeString(val.strVal) << "\"\n";
+            break;
+        case Value::LIST:
+            // Poderia serializar a lista inteira; por simplicidade, empurramos NIL.
+            out << "; TODO: literal de lista pré-avaliada\n";
+            out << "PUSH_NIL\n";
+            break;
+        case Value::NIL:
+        default:
+            out << "PUSH_NIL\n";
+            break;
+        }
+    }
 };
 
 class Variable : public Expression {
@@ -78,6 +117,10 @@ public:
     Value execute() override {
         if (globals.find(name) == globals.end()) return Value(); 
         return globals[name];
+    }
+
+    void generate(std::ostream& out) override {
+        out << "LOAD " << name << "\n";
     }
 };
 
@@ -96,7 +139,15 @@ public:
         std::cerr << "Erro: Acesso invalido a lista " << name << std::endl;
         return Value();
     }
+
+    void generate(std::ostream& out) override {
+        out << "LOAD " << name << "\n";
+        indexExpr->generate(out);
+        out << "INDEX\n";
+    }
 };
+
+// -------------------- Operações, funções e listas --------------------
 
 class BinaryOp : public Expression {
     Expression *left, *right;
@@ -135,6 +186,26 @@ public:
 
         return Value();
     }
+
+    void generate(std::ostream& out) override {
+        left->generate(out);
+        right->generate(out);
+
+        if (op == "+")        out << "ADD\n";
+        else if (op == "-")   out << "SUB\n";
+        else if (op == "*")   out << "MUL\n";
+        else if (op == "/")   out << "DIV\n";
+        else if (op == "%")   out << "MOD\n";
+        else if (op == "==")  out << "CMP_EQ\n";
+        else if (op == "!=")  out << "CMP_NEQ\n";
+        else if (op == "<")   out << "CMP_LT\n";
+        else if (op == "<=")  out << "CMP_LTE\n";
+        else if (op == ">")   out << "CMP_GT\n";
+        else if (op == ">=")  out << "CMP_GTE\n";
+        else if (op == "AND") out << "AND\n";
+        else if (op == "OR")  out << "OR\n";
+        else out << "; operador não suportado: " << op << "\n";
+    }
 };
 
 class LengthFunc : public Expression {
@@ -147,6 +218,11 @@ public:
         if (v.type == Value::STRING) return Value((double)v.strVal.size());
         return Value(0.0);
     }
+
+    void generate(std::ostream& out) override {
+        target->generate(out);
+        out << "LEN\n";
+    }
 };
 
 class ListLiteral : public Expression {
@@ -158,7 +234,16 @@ public:
         for (auto e : elements) list.push_back(e->execute());
         return Value(list);
     }
+
+    void generate(std::ostream& out) override {
+        for (auto e : elements) {
+            e->generate(out);
+        }
+        out << "BUILD_LIST " << elements.size() << "\n";
+    }
 };
+
+// -------------------- Estruturas de bloco e statements --------------------
 
 class Block : public Node {
     std::vector<Node*> statements;
@@ -167,6 +252,12 @@ public:
     Value execute() override {
         for (auto s : statements) s->execute();
         return Value();
+    }
+
+    void generate(std::ostream& out) override {
+        for (auto s : statements) {
+            s->generate(out);
+        }
     }
 };
 
@@ -200,6 +291,20 @@ public:
         }
         return res;
     }
+
+    void generate(std::ostream& out) override {
+        if (indexExpr) {
+            indexExpr->generate(out);   // índice
+            valueExpr->generate(out);   // valor
+            out << "STORE_INDEX " << varName << "\n";
+        } else if (isAppend) {
+            valueExpr->generate(out);
+            out << "APPEND " << varName << "\n";
+        } else {
+            valueExpr->generate(out);
+            out << "STORE " << varName << "\n";
+        }
+    }
 };
 
 class Question : public Node {
@@ -209,6 +314,11 @@ public:
     Value execute() override {
         std::cout << "[?] " << expr->execute().toString() << std::endl;
         return Value();
+    }
+
+    void generate(std::ostream& out) override {
+        expr->generate(out);
+        out << "QUESTION\n";
     }
 };
 
@@ -221,6 +331,17 @@ public:
         std::cout << prefix << " " << expr->execute().toString() << std::endl;
         return Value();
     }
+
+    void generate(std::ostream& out) override {
+        expr->generate(out);
+        if (prefix == ">>") {
+            out << "PRINT\n";
+        } else if (prefix == "!") {
+            out << "PRINT_CONCL\n"; // pode ser só PRINT, depende da sua VM
+        } else {
+            out << "PRINT\n";
+        }
+    }
 };
 
 class InputAnswer : public Node {
@@ -231,7 +352,6 @@ public:
         std::cout << "> ";
         std::string line;
         
-        // --- LIMPEZA DE BUFFER DO INPUT ---
         std::cin >> std::ws; 
         
         if (std::getline(std::cin, line)) {
@@ -248,6 +368,10 @@ public:
         }
         return Value();
     }
+
+    void generate(std::ostream& out) override {
+        out << "INPUT " << varName << "\n";
+    }
 };
 
 class IfStmt : public Node {
@@ -258,11 +382,33 @@ public:
     IfStmt(Expression* c, Block* t, Block* e = nullptr) : cond(c), thenBlock(t), elseBlock(e) {}
     Value execute() override {
         Value c = cond->execute();
-        bool isTrue = (c.type == Value::BOOL && c.boolVal) || (c.type == Value::NUMBER && c.numVal != 0) || (c.type == Value::STRING && c.strVal == "Sim");
+        bool isTrue = (c.type == Value::BOOL && c.boolVal) 
+                   || (c.type == Value::NUMBER && c.numVal != 0) 
+                   || (c.type == Value::STRING && c.strVal == "Sim");
         
         if (isTrue) thenBlock->execute();
         else if (elseBlock) elseBlock->execute();
         return Value();
+    }
+
+    void generate(std::ostream& out) override {
+        int id = nextLabelId();
+        std::string elseLabel = "L_else_" + std::to_string(id);
+        std::string endLabel  = "L_end_if_" + std::to_string(id);
+
+        cond->generate(out);
+        if (elseBlock) {
+            out << "JUMP_IF_FALSE " << elseLabel << "\n";
+            thenBlock->generate(out);
+            out << "JUMP " << endLabel << "\n";
+            out << "LABEL " << elseLabel << "\n";
+            elseBlock->generate(out);
+            out << "LABEL " << endLabel << "\n";
+        } else {
+            out << "JUMP_IF_FALSE " << endLabel << "\n";
+            thenBlock->generate(out);
+            out << "LABEL " << endLabel << "\n";
+        }
     }
 };
 
@@ -274,11 +420,25 @@ public:
     Value execute() override {
         while (true) {
             Value c = cond->execute();
-            bool isTrue = (c.type == Value::BOOL && c.boolVal) || (c.type == Value::NUMBER && c.numVal != 0);
+            bool isTrue = (c.type == Value::BOOL && c.boolVal) 
+                       || (c.type == Value::NUMBER && c.numVal != 0);
             if (!isTrue) break;
             block->execute();
         }
         return Value();
+    }
+
+    void generate(std::ostream& out) override {
+        int id = nextLabelId();
+        std::string startLabel = "L_while_" + std::to_string(id);
+        std::string endLabel   = "L_end_while_" + std::to_string(id);
+
+        out << "LABEL " << startLabel << "\n";
+        cond->generate(out);
+        out << "JUMP_IF_FALSE " << endLabel << "\n";
+        block->generate(out);
+        out << "JUMP " << startLabel << "\n";
+        out << "LABEL " << endLabel << "\n";
     }
 };
 

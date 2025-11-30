@@ -74,6 +74,7 @@
 #include <string>
 #include <stack>
 #include <cstdio>
+#include <fstream>
 #include "ast.h"
 
 extern int yylex();
@@ -84,7 +85,7 @@ void yyerror(const char *s);
 
 Block* rootBlock = nullptr;
 
-#line 88 "parser.tab.c"
+#line 89 "parser.tab.c"
 
 # ifndef YY_CAST
 #  ifdef __cplusplus
@@ -561,12 +562,12 @@ static const yytype_int8 yytranslate[] =
 /* YYRLINE[YYN] -- Source line where rule number YYN was defined.  */
 static const yytype_uint8 yyrline[] =
 {
-       0,    55,    55,    58,    60,    69,    70,    71,    75,    79,
-      80,    81,    82,    83,    84,    85,    89,    90,    91,    96,
-     100,   104,   108,   112,   114,   119,   123,   127,   128,   129,
-     133,   134,   135,   136,   137,   138,   139,   143,   144,   145,
-     149,   150,   151,   152,   156,   157,   158,   159,   160,   161,
-     162,   163,   167,   168,   172,   173
+       0,    56,    56,    59,    61,    66,    67,    68,    72,    76,
+      77,    78,    79,    80,    81,    82,    86,    87,    88,    93,
+      97,   101,   105,   109,   111,   116,   120,   124,   125,   126,
+     130,   131,   132,   133,   134,   135,   136,   140,   141,   142,
+     146,   147,   148,   149,   153,   154,   155,   156,   157,   158,
+     159,   160,   164,   165,   169,   170
 };
 #endif
 
@@ -1466,319 +1467,319 @@ yyreduce:
   switch (yyn)
     {
   case 2: /* program: opt_newlines statements opt_newlines  */
-#line 55 "parser.y"
+#line 56 "parser.y"
                                          { rootBlock = (yyvsp[-1].block); }
-#line 1472 "parser.tab.c"
+#line 1473 "parser.tab.c"
     break;
 
   case 5: /* statements: statement  */
-#line 69 "parser.y"
+#line 66 "parser.y"
                                               { (yyval.block) = new Block(); (yyval.block)->add((yyvsp[0].node)); }
-#line 1478 "parser.tab.c"
+#line 1479 "parser.tab.c"
     break;
 
   case 6: /* statements: statements NEWLINE statement  */
-#line 70 "parser.y"
+#line 67 "parser.y"
                                               { (yyval.block) = (yyvsp[-2].block); (yyval.block)->add((yyvsp[0].node)); }
-#line 1484 "parser.tab.c"
+#line 1485 "parser.tab.c"
     break;
 
   case 7: /* statements: statements NEWLINE  */
-#line 71 "parser.y"
-                                              { (yyval.block) = (yyvsp[-1].block); /* linha em branco ou newline extra */ }
-#line 1490 "parser.tab.c"
+#line 68 "parser.y"
+                                              { (yyval.block) = (yyvsp[-1].block); /* linha em branco */ }
+#line 1491 "parser.tab.c"
     break;
 
   case 8: /* block: TOKEN_INDENT opt_newlines statements TOKEN_DEDENT  */
-#line 75 "parser.y"
+#line 72 "parser.y"
                                                       { (yyval.block) = (yyvsp[-1].block); }
-#line 1496 "parser.tab.c"
+#line 1497 "parser.tab.c"
     break;
 
   case 9: /* statement: assignment  */
-#line 79 "parser.y"
-                  { (yyval.node) = (yyvsp[0].node); }
-#line 1502 "parser.tab.c"
+#line 76 "parser.y"
+                    { (yyval.node) = (yyvsp[0].node); }
+#line 1503 "parser.tab.c"
     break;
 
   case 10: /* statement: question  */
-#line 80 "parser.y"
-                  { (yyval.node) = (yyvsp[0].node); }
-#line 1508 "parser.tab.c"
+#line 77 "parser.y"
+                    { (yyval.node) = (yyvsp[0].node); }
+#line 1509 "parser.tab.c"
     break;
 
   case 11: /* statement: input_ans  */
-#line 81 "parser.y"
-                  { (yyval.node) = (yyvsp[0].node); }
-#line 1514 "parser.tab.c"
+#line 78 "parser.y"
+                    { (yyval.node) = (yyvsp[0].node); }
+#line 1515 "parser.tab.c"
     break;
 
   case 12: /* statement: output  */
-#line 82 "parser.y"
-                  { (yyval.node) = (yyvsp[0].node); }
-#line 1520 "parser.tab.c"
+#line 79 "parser.y"
+                    { (yyval.node) = (yyvsp[0].node); }
+#line 1521 "parser.tab.c"
     break;
 
   case 13: /* statement: conclusion  */
-#line 83 "parser.y"
-                  { (yyval.node) = (yyvsp[0].node); }
-#line 1526 "parser.tab.c"
+#line 80 "parser.y"
+                    { (yyval.node) = (yyvsp[0].node); }
+#line 1527 "parser.tab.c"
     break;
 
   case 14: /* statement: conditional  */
-#line 84 "parser.y"
-                  { (yyval.node) = (yyvsp[0].node); }
-#line 1532 "parser.tab.c"
+#line 81 "parser.y"
+                    { (yyval.node) = (yyvsp[0].node); }
+#line 1533 "parser.tab.c"
     break;
 
   case 15: /* statement: loop  */
-#line 85 "parser.y"
-                  { (yyval.node) = (yyvsp[0].node); }
-#line 1538 "parser.tab.c"
+#line 82 "parser.y"
+                    { (yyval.node) = (yyvsp[0].node); }
+#line 1539 "parser.tab.c"
     break;
 
   case 16: /* assignment: VAR_ID OP_ASSIGN expression  */
-#line 89 "parser.y"
-                                                      { (yyval.node) = new Assignment(*(yyvsp[-2].sVal), (yyvsp[0].expr)); delete (yyvsp[-2].sVal); }
-#line 1544 "parser.tab.c"
+#line 86 "parser.y"
+                                                        { (yyval.node) = new Assignment(*(yyvsp[-2].sVal), (yyvsp[0].expr)); delete (yyvsp[-2].sVal); }
+#line 1545 "parser.tab.c"
     break;
 
   case 17: /* assignment: VAR_ID OP_APPEND expression  */
-#line 90 "parser.y"
-                                                      { (yyval.node) = new Assignment(*(yyvsp[-2].sVal), (yyvsp[0].expr), true); delete (yyvsp[-2].sVal); }
-#line 1550 "parser.tab.c"
+#line 87 "parser.y"
+                                                        { (yyval.node) = new Assignment(*(yyvsp[-2].sVal), (yyvsp[0].expr), true); delete (yyvsp[-2].sVal); }
+#line 1551 "parser.tab.c"
     break;
 
   case 18: /* assignment: VAR_ID LBRACKET expression RBRACKET OP_ASSIGN expression  */
-#line 92 "parser.y"
-                                                      { (yyval.node) = new Assignment(*(yyvsp[-5].sVal), (yyvsp[-3].expr), (yyvsp[0].expr)); delete (yyvsp[-5].sVal); }
-#line 1556 "parser.tab.c"
+#line 89 "parser.y"
+                                                        { (yyval.node) = new Assignment(*(yyvsp[-5].sVal), (yyvsp[-3].expr), (yyvsp[0].expr)); delete (yyvsp[-5].sVal); }
+#line 1557 "parser.tab.c"
     break;
 
   case 19: /* question: OP_QUEST expression  */
-#line 96 "parser.y"
+#line 93 "parser.y"
                         { (yyval.node) = new Question((yyvsp[0].expr)); }
-#line 1562 "parser.tab.c"
+#line 1563 "parser.tab.c"
     break;
 
   case 20: /* input_ans: OP_GT VAR_ID  */
-#line 100 "parser.y"
+#line 97 "parser.y"
                  { (yyval.node) = new InputAnswer(*(yyvsp[0].sVal)); delete (yyvsp[0].sVal); }
-#line 1568 "parser.tab.c"
+#line 1569 "parser.tab.c"
     break;
 
   case 21: /* output: OP_LOG expression  */
-#line 104 "parser.y"
+#line 101 "parser.y"
                       { (yyval.node) = new Output(">>", (yyvsp[0].expr)); }
-#line 1574 "parser.tab.c"
+#line 1575 "parser.tab.c"
     break;
 
   case 22: /* conclusion: OP_CONCL expression  */
-#line 108 "parser.y"
+#line 105 "parser.y"
                         { (yyval.node) = new Output("!", (yyvsp[0].expr)); }
-#line 1580 "parser.tab.c"
+#line 1581 "parser.tab.c"
     break;
 
   case 23: /* conditional: OP_ARROW KW_SE expression COLON block  */
-#line 113 "parser.y"
+#line 110 "parser.y"
         { (yyval.node) = new IfStmt((yyvsp[-2].expr), (yyvsp[0].block)); }
-#line 1586 "parser.tab.c"
+#line 1587 "parser.tab.c"
     break;
 
   case 24: /* conditional: OP_ARROW KW_SE expression COLON block OP_ARROW KW_SENAO COLON block  */
-#line 115 "parser.y"
+#line 112 "parser.y"
         { (yyval.node) = new IfStmt((yyvsp[-6].expr), (yyvsp[-4].block), (yyvsp[0].block)); }
-#line 1592 "parser.tab.c"
+#line 1593 "parser.tab.c"
     break;
 
   case 25: /* loop: KW_ENQUANTO expression COLON block  */
-#line 119 "parser.y"
+#line 116 "parser.y"
                                        { (yyval.node) = new WhileStmt((yyvsp[-2].expr), (yyvsp[0].block)); }
-#line 1598 "parser.tab.c"
+#line 1599 "parser.tab.c"
     break;
 
   case 26: /* expression: logic_expr  */
-#line 123 "parser.y"
+#line 120 "parser.y"
                { (yyval.expr) = (yyvsp[0].expr); }
-#line 1604 "parser.tab.c"
+#line 1605 "parser.tab.c"
     break;
 
   case 27: /* logic_expr: logic_expr OP_AND comp_expr  */
-#line 127 "parser.y"
-                                { (yyval.expr) = new BinaryOp((yyvsp[-2].expr), "AND", (yyvsp[0].expr)); }
-#line 1610 "parser.tab.c"
+#line 124 "parser.y"
+                                  { (yyval.expr) = new BinaryOp((yyvsp[-2].expr), "AND", (yyvsp[0].expr)); }
+#line 1611 "parser.tab.c"
     break;
 
   case 28: /* logic_expr: logic_expr OP_OR comp_expr  */
-#line 128 "parser.y"
+#line 125 "parser.y"
                                   { (yyval.expr) = new BinaryOp((yyvsp[-2].expr), "OR",  (yyvsp[0].expr)); }
-#line 1616 "parser.tab.c"
+#line 1617 "parser.tab.c"
     break;
 
   case 29: /* logic_expr: comp_expr  */
-#line 129 "parser.y"
-                { (yyval.expr) = (yyvsp[0].expr); }
-#line 1622 "parser.tab.c"
+#line 126 "parser.y"
+                                { (yyval.expr) = (yyvsp[0].expr); }
+#line 1623 "parser.tab.c"
     break;
 
   case 30: /* comp_expr: math_expr OP_EQ math_expr  */
-#line 133 "parser.y"
-                               { (yyval.expr) = new BinaryOp((yyvsp[-2].expr), "==", (yyvsp[0].expr)); }
-#line 1628 "parser.tab.c"
+#line 130 "parser.y"
+                                 { (yyval.expr) = new BinaryOp((yyvsp[-2].expr), "==", (yyvsp[0].expr)); }
+#line 1629 "parser.tab.c"
     break;
 
   case 31: /* comp_expr: math_expr OP_NEQ math_expr  */
-#line 134 "parser.y"
+#line 131 "parser.y"
                                  { (yyval.expr) = new BinaryOp((yyvsp[-2].expr), "!=", (yyvsp[0].expr)); }
-#line 1634 "parser.tab.c"
+#line 1635 "parser.tab.c"
     break;
 
   case 32: /* comp_expr: math_expr OP_LT math_expr  */
-#line 135 "parser.y"
+#line 132 "parser.y"
                                  { (yyval.expr) = new BinaryOp((yyvsp[-2].expr), "<",  (yyvsp[0].expr)); }
-#line 1640 "parser.tab.c"
+#line 1641 "parser.tab.c"
     break;
 
   case 33: /* comp_expr: math_expr OP_LTE math_expr  */
-#line 136 "parser.y"
+#line 133 "parser.y"
                                  { (yyval.expr) = new BinaryOp((yyvsp[-2].expr), "<=", (yyvsp[0].expr)); }
-#line 1646 "parser.tab.c"
+#line 1647 "parser.tab.c"
     break;
 
   case 34: /* comp_expr: math_expr OP_GT math_expr  */
-#line 137 "parser.y"
+#line 134 "parser.y"
                                  { (yyval.expr) = new BinaryOp((yyvsp[-2].expr), ">",  (yyvsp[0].expr)); }
-#line 1652 "parser.tab.c"
+#line 1653 "parser.tab.c"
     break;
 
   case 35: /* comp_expr: math_expr OP_GTE math_expr  */
-#line 138 "parser.y"
+#line 135 "parser.y"
                                  { (yyval.expr) = new BinaryOp((yyvsp[-2].expr), ">=", (yyvsp[0].expr)); }
-#line 1658 "parser.tab.c"
+#line 1659 "parser.tab.c"
     break;
 
   case 36: /* comp_expr: math_expr  */
-#line 139 "parser.y"
-                { (yyval.expr) = (yyvsp[0].expr); }
-#line 1664 "parser.tab.c"
+#line 136 "parser.y"
+                                { (yyval.expr) = (yyvsp[0].expr); }
+#line 1665 "parser.tab.c"
     break;
 
   case 37: /* math_expr: math_expr PLUS term  */
-#line 143 "parser.y"
-                         { (yyval.expr) = new BinaryOp((yyvsp[-2].expr), "+", (yyvsp[0].expr)); }
-#line 1670 "parser.tab.c"
+#line 140 "parser.y"
+                           { (yyval.expr) = new BinaryOp((yyvsp[-2].expr), "+", (yyvsp[0].expr)); }
+#line 1671 "parser.tab.c"
     break;
 
   case 38: /* math_expr: math_expr MINUS term  */
-#line 144 "parser.y"
+#line 141 "parser.y"
                            { (yyval.expr) = new BinaryOp((yyvsp[-2].expr), "-", (yyvsp[0].expr)); }
-#line 1676 "parser.tab.c"
+#line 1677 "parser.tab.c"
     break;
 
   case 39: /* math_expr: term  */
-#line 145 "parser.y"
-           { (yyval.expr) = (yyvsp[0].expr); }
-#line 1682 "parser.tab.c"
+#line 142 "parser.y"
+                           { (yyval.expr) = (yyvsp[0].expr); }
+#line 1683 "parser.tab.c"
     break;
 
   case 40: /* term: term MULT factor  */
-#line 149 "parser.y"
-                     { (yyval.expr) = new BinaryOp((yyvsp[-2].expr), "*", (yyvsp[0].expr)); }
-#line 1688 "parser.tab.c"
+#line 146 "parser.y"
+                       { (yyval.expr) = new BinaryOp((yyvsp[-2].expr), "*", (yyvsp[0].expr)); }
+#line 1689 "parser.tab.c"
     break;
 
   case 41: /* term: term DIV factor  */
-#line 150 "parser.y"
+#line 147 "parser.y"
                        { (yyval.expr) = new BinaryOp((yyvsp[-2].expr), "/", (yyvsp[0].expr)); }
-#line 1694 "parser.tab.c"
+#line 1695 "parser.tab.c"
     break;
 
   case 42: /* term: term MOD factor  */
-#line 151 "parser.y"
+#line 148 "parser.y"
                        { (yyval.expr) = new BinaryOp((yyvsp[-2].expr), "%", (yyvsp[0].expr)); }
-#line 1700 "parser.tab.c"
+#line 1701 "parser.tab.c"
     break;
 
   case 43: /* term: factor  */
-#line 152 "parser.y"
-             { (yyval.expr) = (yyvsp[0].expr); }
-#line 1706 "parser.tab.c"
+#line 149 "parser.y"
+                       { (yyval.expr) = (yyvsp[0].expr); }
+#line 1707 "parser.tab.c"
     break;
 
   case 44: /* factor: LPAREN expression RPAREN  */
-#line 156 "parser.y"
-                                           { (yyval.expr) = (yyvsp[-1].expr); }
-#line 1712 "parser.tab.c"
+#line 153 "parser.y"
+                                             { (yyval.expr) = (yyvsp[-1].expr); }
+#line 1713 "parser.tab.c"
     break;
 
   case 45: /* factor: LIT_NUMBER  */
-#line 157 "parser.y"
-                                           { (yyval.expr) = new Literal(Value((yyvsp[0].dVal))); }
-#line 1718 "parser.tab.c"
+#line 154 "parser.y"
+                                             { (yyval.expr) = new Literal(Value((yyvsp[0].dVal))); }
+#line 1719 "parser.tab.c"
     break;
 
   case 46: /* factor: LIT_STRING  */
-#line 158 "parser.y"
-                                           { (yyval.expr) = new Literal(Value(*(yyvsp[0].sVal))); delete (yyvsp[0].sVal); }
-#line 1724 "parser.tab.c"
+#line 155 "parser.y"
+                                             { (yyval.expr) = new Literal(Value(*(yyvsp[0].sVal))); delete (yyvsp[0].sVal); }
+#line 1725 "parser.tab.c"
     break;
 
   case 47: /* factor: LIT_BOOL  */
-#line 159 "parser.y"
-                                           { (yyval.expr) = new Literal(Value((yyvsp[0].bVal))); }
-#line 1730 "parser.tab.c"
+#line 156 "parser.y"
+                                             { (yyval.expr) = new Literal(Value((yyvsp[0].bVal))); }
+#line 1731 "parser.tab.c"
     break;
 
   case 48: /* factor: VAR_ID  */
-#line 160 "parser.y"
-                                           { (yyval.expr) = new Variable(*(yyvsp[0].sVal)); delete (yyvsp[0].sVal); }
-#line 1736 "parser.tab.c"
+#line 157 "parser.y"
+                                             { (yyval.expr) = new Variable(*(yyvsp[0].sVal)); delete (yyvsp[0].sVal); }
+#line 1737 "parser.tab.c"
     break;
 
   case 49: /* factor: VAR_ID LBRACKET expression RBRACKET  */
-#line 161 "parser.y"
-                                           { (yyval.expr) = new ListAccess(*(yyvsp[-3].sVal), (yyvsp[-1].expr)); delete (yyvsp[-3].sVal); }
-#line 1742 "parser.tab.c"
+#line 158 "parser.y"
+                                             { (yyval.expr) = new ListAccess(*(yyvsp[-3].sVal), (yyvsp[-1].expr)); delete (yyvsp[-3].sVal); }
+#line 1743 "parser.tab.c"
     break;
 
   case 50: /* factor: list_def  */
-#line 162 "parser.y"
-                                           { (yyval.expr) = (yyvsp[0].listLit); }
-#line 1748 "parser.tab.c"
+#line 159 "parser.y"
+                                             { (yyval.expr) = (yyvsp[0].listLit); }
+#line 1749 "parser.tab.c"
     break;
 
   case 51: /* factor: KW_TAMANHO LPAREN VAR_ID RPAREN  */
-#line 163 "parser.y"
-                                           { (yyval.expr) = new LengthFunc(new Variable(*(yyvsp[-1].sVal))); delete (yyvsp[-1].sVal); }
-#line 1754 "parser.tab.c"
+#line 160 "parser.y"
+                                             { (yyval.expr) = new LengthFunc(new Variable(*(yyvsp[-1].sVal))); delete (yyvsp[-1].sVal); }
+#line 1755 "parser.tab.c"
     break;
 
   case 52: /* list_def: LBRACKET RBRACKET  */
-#line 167 "parser.y"
-                                   { (yyval.listLit) = new ListLiteral(); }
-#line 1760 "parser.tab.c"
+#line 164 "parser.y"
+                                     { (yyval.listLit) = new ListLiteral(); }
+#line 1761 "parser.tab.c"
     break;
 
   case 53: /* list_def: LBRACKET list_items RBRACKET  */
-#line 168 "parser.y"
-                                   { (yyval.listLit) = (yyvsp[-1].listLit); }
-#line 1766 "parser.tab.c"
+#line 165 "parser.y"
+                                     { (yyval.listLit) = (yyvsp[-1].listLit); }
+#line 1767 "parser.tab.c"
     break;
 
   case 54: /* list_items: list_items COMMA expression  */
-#line 172 "parser.y"
-                                { (yyval.listLit) = (yyvsp[-2].listLit); (yyval.listLit)->add((yyvsp[0].expr)); }
-#line 1772 "parser.tab.c"
+#line 169 "parser.y"
+                                  { (yyval.listLit) = (yyvsp[-2].listLit); (yyval.listLit)->add((yyvsp[0].expr)); }
+#line 1773 "parser.tab.c"
     break;
 
   case 55: /* list_items: expression  */
-#line 173 "parser.y"
-                                { (yyval.listLit) = new ListLiteral(); (yyval.listLit)->add((yyvsp[0].expr)); }
-#line 1778 "parser.tab.c"
+#line 170 "parser.y"
+                                  { (yyval.listLit) = new ListLiteral(); (yyval.listLit)->add((yyvsp[0].expr)); }
+#line 1779 "parser.tab.c"
     break;
 
 
-#line 1782 "parser.tab.c"
+#line 1783 "parser.tab.c"
 
       default: break;
     }
@@ -2002,7 +2003,7 @@ yyreturnlab:
   return yyresult;
 }
 
-#line 176 "parser.y"
+#line 173 "parser.y"
 
 
 void yyerror(const char *s) {
@@ -2010,31 +2011,56 @@ void yyerror(const char *s) {
 }
 
 int main(int argc, char** argv) {
-    if (argc > 1) {
-        FILE *file = fopen(argv[1], "r");
-        if (!file) {
-            std::cerr << "Erro ao abrir o arquivo: " << argv[1] << std::endl;
-            return 1;
-        }
-        yyin = file;
-    } else {
-        std::cout << "Modo Interativo (Ctrl+D para sair)." << std::endl;
-        yyin = stdin;
+    if (argc < 2) {
+        std::cerr << "Uso: " << argv[0] << " fonte.ms [saida.asm]" << std::endl;
+        return 1;
     }
+
+    std::string inputFile  = argv[1];
+    std::string outputFile;
+
+    // Se o usuário passar o .asm explicitamente, usa. Senão, troca a extensão.
+    if (argc >= 3) {
+        outputFile = argv[2];
+    } else {
+        outputFile = inputFile;
+        size_t dot = outputFile.find_last_of('.');
+        if (dot != std::string::npos) {
+            outputFile = outputFile.substr(0, dot);
+        }
+        outputFile += ".asm";
+    }
+
+    FILE *file = fopen(inputFile.c_str(), "r");
+    if (!file) {
+        std::cerr << "Erro ao abrir o arquivo: " << inputFile << std::endl;
+        return 1;
+    }
+    yyin = file;
 
     if (indent_stack.empty()) indent_stack.push(0);
 
-    std::cout << "--- Interpretador Maieutic Iniciado ---" << std::endl;
-    
+    // Agora: COMPILA para .asm em vez de executar a AST
     if (yyparse() == 0 && rootBlock != nullptr) {
-        std::cout << "Sintaxe OK. Executando..." << std::endl << std::endl;
-        try {
-            rootBlock->execute();
-        } catch (const std::exception& e) {
-            std::cerr << "Erro de Execucao: " << e.what() << std::endl;
+        std::ofstream out(outputFile);
+        if (!out) {
+            std::cerr << "Erro ao criar arquivo de saída: " << outputFile << std::endl;
+            fclose(file);
+            return 1;
         }
+
+        out << "; Arquivo gerado pelo compilador Maiêutic\n";
+        out << "; Fonte: " << inputFile << "\n\n";
+
+        rootBlock->generate(out);
+
+        out << "\nHALT\n";
+
+        std::cout << "Assembly gerado em: " << outputFile << std::endl;
+    } else {
+        std::cerr << "Erro de sintaxe. Assembly não gerado." << std::endl;
     }
-    
-    if (argc > 1) fclose(yyin);
+
+    fclose(file);
     return 0;
 }

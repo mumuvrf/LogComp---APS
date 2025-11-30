@@ -1,0 +1,7 @@
+[?] Início do teste de fluxo. Digite 1:
+> 1
+>> Nível 1 OK
+>>   Nível 2 (Loop): 0
+>>   Nível 2 (Loop): 1
+>>     Nível 3 (Branch interno)
+! Teste finalizado. Tamanho da lista: 3

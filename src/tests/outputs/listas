@@ -1,0 +1,7 @@
+>> Lista inicial: [Maca, Banana]
+>> Apos append: [Maca, Banana, Laranja]
+! Tamanho atual: 3
+>> Primeira: Maca
+>> Ultima: Laranja
+! Soma dos elementos: 60
+! Lista gerada no loop: [0, 100, 200]
