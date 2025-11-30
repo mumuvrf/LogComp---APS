@@ -54,17 +54,42 @@ extern int yydebug;
     YYEOF = 0,                     /* "end of file"  */
     YYerror = 256,                 /* error  */
     YYUNDEF = 257,                 /* "invalid token"  */
-    QUESTION = 258,                /* QUESTION  */
-    SUBQUESTION = 259,             /* SUBQUESTION  */
-    ANSWER = 260,                  /* ANSWER  */
-    BRANCH = 261,                  /* BRANCH  */
-    WHILE = 262,                   /* WHILE  */
-    REPEAT = 263,                  /* REPEAT  */
-    CONCLUSION = 264,              /* CONCLUSION  */
-    TEXT = 265,                    /* TEXT  */
-    INDENT = 266,                  /* INDENT  */
-    DEDENT = 267,                  /* DEDENT  */
-    NEWLINE = 268                  /* NEWLINE  */
+    VAR_ID = 258,                  /* VAR_ID  */
+    LIT_STRING = 259,              /* LIT_STRING  */
+    LIT_NUMBER = 260,              /* LIT_NUMBER  */
+    LIT_BOOL = 261,                /* LIT_BOOL  */
+    TOKEN_INDENT = 262,            /* TOKEN_INDENT  */
+    TOKEN_DEDENT = 263,            /* TOKEN_DEDENT  */
+    KW_SE = 264,                   /* KW_SE  */
+    KW_SENAO = 265,                /* KW_SENAO  */
+    KW_ENQUANTO = 266,             /* KW_ENQUANTO  */
+    KW_TAMANHO = 267,              /* KW_TAMANHO  */
+    OP_ASSIGN = 268,               /* OP_ASSIGN  */
+    OP_APPEND = 269,               /* OP_APPEND  */
+    OP_ARROW = 270,                /* OP_ARROW  */
+    OP_EQ = 271,                   /* OP_EQ  */
+    OP_NEQ = 272,                  /* OP_NEQ  */
+    OP_GTE = 273,                  /* OP_GTE  */
+    OP_LTE = 274,                  /* OP_LTE  */
+    OP_LT = 275,                   /* OP_LT  */
+    OP_GT = 276,                   /* OP_GT  */
+    OP_LOG = 277,                  /* OP_LOG  */
+    OP_QUEST = 278,                /* OP_QUEST  */
+    OP_CONCL = 279,                /* OP_CONCL  */
+    COLON = 280,                   /* COLON  */
+    COMMA = 281,                   /* COMMA  */
+    LBRACKET = 282,                /* LBRACKET  */
+    RBRACKET = 283,                /* RBRACKET  */
+    LPAREN = 284,                  /* LPAREN  */
+    RPAREN = 285,                  /* RPAREN  */
+    PLUS = 286,                    /* PLUS  */
+    MINUS = 287,                   /* MINUS  */
+    MULT = 288,                    /* MULT  */
+    DIV = 289,                     /* DIV  */
+    MOD = 290,                     /* MOD  */
+    OP_AND = 291,                  /* OP_AND  */
+    OP_OR = 292,                   /* OP_OR  */
+    NEWLINE = 293                  /* NEWLINE  */
   };
   typedef enum yytokentype yytoken_kind_t;
 #endif
@@ -73,11 +98,17 @@ extern int yydebug;
 #if ! defined YYSTYPE && ! defined YYSTYPE_IS_DECLARED
 union YYSTYPE
 {
-#line 24 "parser.y"
+#line 20 "parser.y"
 
-    char *s;
+    double dVal;
+    bool bVal;
+    std::string* sVal;
+    Node* node;
+    Expression* expr;
+    Block* block;
+    ListLiteral* listLit;
 
-#line 81 "parser.tab.h"
+#line 112 "parser.tab.h"
 
 };
 typedef union YYSTYPE YYSTYPE;
