@@ -1,232 +1,378 @@
-# LogComp---APS
-Repositório dedicado ao desenvolvimento da Atividade Prática Supersivionada, cujo objetivo é a criação de uma linguagem de programação, da disciplina de Lógica da Computação do Insper.
+# Maiêutic – Linguagem, Compilador e Máquina Virtual (SocraticVM)
 
 **Aluno:** Vinícius Rodrigues de Freitas
 
+Repositório dedicado ao desenvolvimento da **Atividade Prática Supersivionada** da disciplina de **Lógica da Computação** do Insper, cujo objetivo é projetar e implementar:
 
-## Linguagem proposta
+- uma **linguagem de programação** inspirada na **Maiêutica de Sócrates**;
+- um **compilador** (C++/Flex/Bison) que gera um assembly próprio;
+- uma **máquina virtual** em Python (**SocraticVM**) que executa esse assembly.
 
-Uma linguagem de programação com o objetivo de elaborar um roteiro de aprendizado pleno a partir da aplicação do Método Socrático, especificamente a **Maiêutica**, no âmbito do autoestudo.
+---
 
-A ideia é que seja útil em múltiplas interfaces, seja código, papel ou até mesmo a própria mente do usuário.
+## 1. Ideia da linguagem
 
-## Maiêutica
+A linguagem **Maiêutic** é pensada para escrever **roteiros de investigação e aprendizado** baseados no Método Socrático, especificamente a **Maiêutica**, com foco em autoestudo.
 
-A maiêutica de Sócrates é um método filosófico que faz parte do chamado "método socrático". A palavra vem do grego maieutiké, que significa "arte de partejar". Sócrates usava essa metáfora porque dizia que, assim como sua mãe ajudava mulheres a dar à luz crianças, ele ajudava as pessoas a "dar à luz ideias".
+Em vez de apenas “dar respostas prontas”, o programa conduz uma conversa:
 
-O processo consiste em fazer perguntas sucessivas, de modo a levar a pessoa a refletir sobre o que pensa, identificar contradições, abandonar certezas mal fundamentadas e, aos poucos, construir um conhecimento mais sólido e consciente. Sócrates acreditava que ninguém deveria simplesmente "receber respostas prontas", mas sim ser levado a descobrir por si mesmo.
+- faz **perguntas** sucessivas;
+- armazena respostas em **variáveis**;
+- testa consistência com **condicionais** e **loops**;
+- constrói no final uma **conclusão**.
 
-Na prática pessoal, a maiêutica pode ser aplicada como um exercício de autoquestionamento. Por exemplo:
+Exemplo simplificado:
 
-```
-Em vez de apenas aceitar uma ideia, a pessoa pode perguntar a si mesma: O que exatamente eu quero dizer com isso?
-
-Depois: Por que acredito nisso?
-
-Em seguida: Existe algum exemplo que confirme ou contradiga essa ideia?
-
-Por fim: Essa explicação faz sentido de forma consistente?
-```
-
-## Estrutura EBNF
-
-### Gramática
-
-```
-(* ========================================== *)
-(*      GRAMÁTICA DA LINGUAGEM MAIEUTIC       *)
-(* ========================================== *)
-
-(* --- Estrutura Macro --- *)
-Program            = { Statement } ;
-Block              = Indent , { Statement } , Dedent ;
-
-Statement          = Assignment
-                   | Question
-                   | InputAnswer
-                   | Conditional
-                   | Loop
-                   | Output
-                   | Conclusion
-                   | Comment ;
-
-Comment            = "#" , { AllChars - NewLine } ;
-
-(* --- Gerenciamento de Memória (LValues) --- *)
-Identifier         = Letter , { Letter | Digit | "_" } ;
-Variable           = "@" , Identifier ;
-
-(* Definição de Listas e Acesso *)
-List               = "[" , [ Expression , { "," , Expression } ] , "]" ;
-ListAccess         = Variable , "[" , Expression , "]" ;
-
-(* LValue: Onde podemos gravar dados (Variável ou Posição de Lista) *)
-LValue             = Variable | ListAccess ;
-
-(* --- Atribuição e Modificação --- *)
-(* := substitui o valor. << adiciona ao final (apenas para listas) *)
-AssignmentOperator = ":=" | "<<" ;
-
-Assignment         = LValue , AssignmentOperator , Expression ;
-
-
-(* --- Expressões e Matemática --- *)
-Expression         = LogicExpr ;
-
-LogicExpr          = CompExpr , { ("AND" | "OR") , CompExpr } ;
-CompExpr           = MathExpr , [ ("==" | "!=" | ">" | "<" | ">=" | "<=") , MathExpr ] ;
-
-MathExpr           = Term , { ("+" | "-") , Term } ;
-Term               = Factor , { ("*" | "/" | "%") , Factor } ;
-
-Factor             = "(" , Expression , ")"
-                   | Number
-                   | String
-                   | Boolean
-                   | List
-                   | ListAccess   (* Leitura de valor *)
-                   | Variable     (* Leitura de valor *)
-                   | LengthFunc ;
-
-LengthFunc         = "tamanho_de(" , (Variable | List) , ")" ;
-
-
-(* --- Fluxo Socrático --- *)
-Question           = "?" , Expression ; 
-InputAnswer        = ">" , LValue ; (* Resposta vai para uma LValue *)  
-Output             = ">>" , Expression ;
-Conclusion         = "!" , Expression ;
-
-
-(* --- Controle de Fluxo --- *)
-Conditional        = "->" , "Se" , Expression , ":" , Block 
-                   , [ "->" , "Senao" , ":" , Block ] ;
-
-Loop               = "Enquanto" , Expression , ":" , Block ;
-
-
-(* --- Primitivos Léxicos --- *)
-Boolean            = "Verdadeiro" | "Falso" ;
-Number             = Digit , { Digit } , [ "." , { Digit } ] ;
-String             = '"' , { AllChars - '"' } , '"' ;
-
-(* Indentação é tratada pelo Lexer, gerando tokens INDENT/DEDENT *)
-Indent             = ? TOKEN_INDENT ? ;
-Dedent             = ? TOKEN_DEDENT ? ;
-```
-
-### Explicação dos elementos
-
-- **Program** → é o roteiro de execução lógica, contendo a sequência de perguntas, operações de memória e estruturas de decisão.
-
-- **Variables (@)** → representam o estado do conhecimento (memória). Armazenam definições, contadores ou listas de argumentos que podem ser consultados e alterados.
-
-- **Assignment (:=)** e **Append (<<)** → são operações de modificação do pensamento. `:=` define ou redefine uma premissa, enquanto `<<` adiciona um novo elemento a uma lista de ideias existentes.
-
-- **Question (?)** → inicia uma etapa de investigação, apresentando uma dúvida ou problema.
-
-- **Input Answer (>)** → captura a resposta do interlocutor e a armazena em uma variável para ser validada ou processada logicamente.
-
-- **Log (>>)** → exibe um pensamento intermediário, contexto ou feedback do sistema, sem exigir uma resposta imediata.
-
-- **Branch (-> Se ...)** → representa a bifurcação do raciocínio baseada em lógica booleana. Define caminhos diferentes dependendo da consistência das respostas (Verdadeiro ou Falso).
-
-- **Loop (Enquanto ... :)** → estrutura de repetição analítica. Mantém o ciclo de questionamento ativo até que uma condição específica (como a eliminação da dúvida) seja satisfeita.
-
-- **Conclusion (!)** → marca uma síntese final ou uma formulação madura alcançada após o processamento lógico.
-
-### Exemplos
-
-**Descobrindo a definição de felicidade**
-
-```
-# Inicialização do Estado Epistemológico
+```mai
 @conceito  := "Felicidade"
 @definicao := ""
-@incerteza := Verdadeiro
-@historico_erros := []  # Lista para guardar as definições descartadas
 
 >> "Iniciando investigação sobre: " + @conceito
-
-? "Para começar, como você define " + @conceito + " em poucas palavras?"
+? "Como você define " + @conceito + "?"
 > @definicao
 
-# O Ciclo Dialético (Elenchos)
-Enquanto @incerteza == Verdadeiro:
+Enquanto @definicao == "":
+    ? "Tente uma definição mínima:"
+    > @definicao
 
-    >> "Analisando a proposição: '" + @definicao + "'"
-    
-    # O Teste de Consistência (Ironia Socrática simulada)
-    ? "Consegue imaginar alguém que possui isso (" + @definicao + ") mas ainda é miserável? (Sim/Não)"
-    > @existe_contradicao
-    
-    -> Se @existe_contradicao == "Sim":
-        # Momento de Aporia (O reconhecimento do erro)
-        ? "O que falta a essa pessoa, mesmo tendo " + @definicao + "?"
-        > @elemento_faltante
-        
-        # Guardamos a definição velha na lista de erros antes de mudar
-        @historico_erros << @definicao
-        
-        >> "Interessante. Então '" + @definicao + "' é insuficiente pois ignora '" + @elemento_faltante + "'."
-        
-        ? "Tente uma nova definição que inclua " + @elemento_faltante + ":"
-        > @definicao  # Atualizamos a variável com a nova crença (Mutabilidade)
-        
-    -> Senao:
-        # Se o usuário não encontra contradição, testamos a solidez
-        ? "Essa definição depende de coisas externas (sorte) ou internas (ser)? (Externas/Internas)"
-        > @origem
-        
-        -> Se @origem == "Externas":
-            >> "Se depende da sorte, pode ser perdida. Felicidade frágil não é plena."
-            >> "Vamos tentar aprofundar..."
-            # O loop continua, forçando o usuário a repensar
-            
-        -> Senao:
-            # Critério de parada: Definição robusta e interna
-            @incerteza := Falso
+! "Definição atual: " + @definicao
+````
 
-# A Síntese (Maiêutica completa)
->> "Investigação encerrada."
->> "Você abandonou " + tamanho_de(@historico_erros) + " definições superficiais: " + @historico_erros
+### Principais elementos da sintaxe
 
-! "Sua definição madura de Felicidade é: " + @definicao
+* **Variáveis**: `@nome`
+* **Atribuição**: `@x := 10`
+* **Append em listas**: `@lista << valor`
+* **Pergunta**: `? expressao`
+* **Leitura de resposta**: `> @variavel`
+* **Log / mensagem intermediária**: `>> expressao`
+* **Conclusão**: `! expressao`
+* **Condicional**:
+
+  ```mai
+  -> Se @x > 0:
+      ...
+  -> Senao:
+      ...
+  ```
+* **Loop**:
+
+  ```mai
+  Enquanto @x > 0:
+      ...
+  ```
+* **Listas**: `[1, 2, 3]`, acesso `@lista[0]`
+* **Função de tamanho**: `tamanho_de(@lista)`
+
+A gramática completa em EBNF está documentada em `/docs`.
+
+---
+
+## 2. Estrutura do repositório
+
+Visão geral (pode variar levemente conforme evolução do projeto):
+
+```text
+├── docs/                     # Documentação (linguagem, VM, etc.)
+└── src/
+    ├── compiler/             # Compilador em C++ (Flex/Bison)
+    │   ├── lexer.l
+    │   ├── parser.y
+    │   ├── ast.h
+    │   └── Makefile
+    ├── vm/
+    │   └── socraticvm.py     # Máquina virtual em Python
+    ├── examples/             # Programas exemplo em Maiêutic (.ms)
+    │   ├── felicidade.ms
+    │   ├── navio_de_teseu.ms
+    │   └── verificador_de_primos.ms
+    └── tests/
+        ├── compiler/         # Testes de compilação (.ms)
+        │   ├── geral1.ms
+        │   ├── geral2.ms
+        │   ├── input.ms
+        │   ├── listas.ms
+        │   └── loop.ms
+        ├── outputs/          # Testes de execução interpretada (entradas/saídas esperadas)
+        │   ├── condicional
+        │   ├── geral1
+        │   ├── geral2
+        │   ├── input
+        │   ├── listas
+        │   └── loop
+        └── vm/               # Testes da VM (assembly pronto)
+            ├── condicional.asm
+            ├── geral1.asm
+            ├── geral2.asm
+            ├── input.asm
+            ├── listas.asm
+            └── loop.asm
 ```
 
-**Verificador de números primos**
+---
 
+## 3. Compilador da linguagem Maiêutic
+
+O compilador é construído a partir de:
+
+* `lexer.l` – analisador léxico (Flex)
+* `parser.y` – analisador sintático + `main`
+* `ast.h` – AST + geração de código assembly (`generate(std::ostream&)`)
+* `Makefile` – automatiza o build
+
+### 3.1 Dependências
+
+Instale:
+
+* `flex`
+* `bison`
+* `g++` (C++17)
+* `make`
+
+Em Debian/Ubuntu:
+
+```bash
+sudo apt-get install flex bison g++ make
 ```
-# Programa: Verificador de Números Primos
-# Objetivo: Teste de carga aritmética e lógica booleana estrita.
 
-@numero := 0
-@divisor := 2
-@eh_primo := Verdadeiro
+### 3.2 Compilando o compilador
 
-? "Digite um número inteiro positivo para verificar primariedade:"
-> @numero
+No diretório do compilador:
 
--> Se @numero <= 1:
-    @eh_primo := Falso
-    >> "Números menores ou iguais a 1 não são primos."
-
--> Senao:
-    # Otimização matemática: verificar até a raiz quadrada (simulada)
-    # Loop de divisão
-    Enquanto (@divisor * @divisor) <= @numero:
-        
-        # Operador Módulo (%) testando resto da divisão
-        -> Se (@numero % @divisor) == 0:
-            @eh_primo := Falso
-            # Forçamos a saída do loop tornando a condição do Enquanto falsa
-            @divisor := @numero 
-        
-        @divisor := @divisor + 1
-
-# Saída
--> Se @eh_primo == Verdadeiro:
-    ! "O número " + @numero + " É PRIMO."
--> Senao:
-    ! "O número " + @numero + " NÃO É PRIMO."
+```bash
+cd src/compiler
+make
 ```
+
+O `Makefile` faz:
+
+```make
+all: maieutic
+
+maieutic: lexer.l parser.y ast.h
+	bison -d parser.y
+	flex lexer.l
+	g++ -std=c++17 parser.tab.c lex.yy.c -o maieutic -lm
+
+clean:
+	rm maieutic parser.tab.c parser.tab.h lex.yy.c
+```
+
+Após `make`, o binário `maieutic` estará disponível em `src/compiler/`.
+
+Para limpar arquivos gerados:
+
+```bash
+make clean
+```
+
+### 3.3 Usando o compilador
+
+Sintaxe de uso:
+
+```text
+Uso: maieutic fonte.ms [saida.asm]
+```
+
+* `fonte.ms` – arquivo na linguagem Maiêutic.
+* `saida.asm` – (opcional) nome do arquivo assembly de saída.
+
+#### Gerando `.asm` com nome explícito
+
+```bash
+cd src/compiler
+./maieutic ../../examples/felicidade.ms ../../examples/felicidade.asm
+```
+
+#### Gerando `.asm` automaticamente
+
+Se você omitir o segundo argumento, o compilador troca a extensão do arquivo de entrada por `.asm`:
+
+```bash
+./maieutic ../../examples/felicidade.ms
+# gera ../../examples/felicidade.asm
+```
+
+Regra geral:
+
+| Comando                       | Saída gerada   |
+| ----------------------------- | -------------- |
+| `./maieutic programa.ms`      | `programa.asm` |
+| `./maieutic roteiro.maieutic` | `roteiro.asm`  |
+| `./maieutic fonte.ms out.asm` | `out.asm`      |
+
+### 3.4 Erros de compilação
+
+Erros sintáticos são reportados com linha:
+
+```text
+Erro de Sintaxe: <detalhes> na linha <n>
+Erro de sintaxe. Assembly não gerado.
+```
+
+Em caso de erro, o arquivo `.asm` **não** é criado.
+
+---
+
+## 4. SocraticVM – Máquina Virtual
+
+A **SocraticVM** é uma **máquina de pilha** em Python que executa o assembly gerado pelo compilador.
+
+Arquivo principal: `src/vm/socraticvm.py`.
+
+### 4.1 Como executar um programa `.asm`
+
+```bash
+cd src/vm
+python3 socraticvm.py caminho/para/programa.asm
+```
+
+Para ver o “trace” das instruções:
+
+```bash
+python3 socraticvm.py caminho/para/programa.asm --trace
+```
+
+### 4.2 Visão rápida da arquitetura
+
+* **Pilha de execução** (`stackVM`) – onde as operações aritméticas, lógicas e de listas são feitas.
+* **Memória de variáveis** (`variables`) – dicionário nome → valor (`Value`).
+* **Tipos de valor**:
+
+  * `NIL`, `BOOL`, `NUMBER`, `STRING`, `LIST`.
+* **Labels** (`LABEL nome`) – marcadores de posição para saltos (`JUMP`, `JUMP_IF_FALSE`).
+* **Registradores auxiliares** (`reg0`, `reg1`).
+* **Sensores**:
+
+  * `READ_SENSOR time` – segundos desde o início do programa;
+  * `READ_SENSOR rand` – número aleatório em `[0, 1)`.
+
+### 4.3 Instruções principais (resumo)
+
+* **Pilhas e literais**: `PUSH_NUM`, `PUSH_BOOL`, `PUSH_STR`, `PUSH_NIL`.
+* **Variáveis**: `LOAD`, `STORE`, `APPEND`, `STORE_INDEX`.
+* **Listas**: `BUILD_LIST`, `INDEX`.
+* **Aritmética**: `ADD`, `SUB`, `MUL`, `DIV`, `MOD`.
+* **Comparações**: `CMP_EQ`, `CMP_NEQ`, `CMP_LT`, `CMP_LTE`, `CMP_GT`, `CMP_GTE`.
+* **Lógica**: `AND`, `OR`, `LEN`.
+* **Controle de fluxo**: `JUMP`, `JUMP_IF_FALSE`, `LABEL`, `HALT`.
+* **I/O “socrático”**:
+
+  * `QUESTION` → imprime `[?] mensagem`
+  * `PRINT` → imprime `>> mensagem`
+  * `PRINT_CONCL` → imprime `! mensagem`
+  * `INPUT <var>` → lê do usuário e converte para número, booleano ou string.
+
+Uma especificação mais detalhada da VM está em `/docs`.
+
+---
+
+## 5. Fluxo completo: do código Maiêutic à execução
+
+1. **Escreva o programa** em `.ms`, por exemplo:
+
+   ```mai
+   # arquivo: exemplos/verificador_de_primos.ms
+   ...
+   ```
+
+2. **Compile para assembly**:
+
+   ```bash
+   cd src/compiler
+   ./maieutic ../../examples/verificador_de_primos.ms
+   # gera ../../examples/verificador_de_primos.asm
+   ```
+
+3. **Execute o assembly** na SocraticVM:
+
+   ```bash
+   cd ../vm
+   python3 socraticvm.py ../../examples/verificador_de_primos.asm
+   ```
+
+4. (Opcional) debug com `--trace` para inspecionar passo a passo:
+
+   ```bash
+   python3 socraticvm.py ../../examples/verificador_de_primos.asm --trace
+   ```
+
+---
+
+## 6. Exemplos de programas
+
+No diretório `examples/` há roteiros Maiêutic prontos, como:
+
+* `felicidade.ms` – investigação sobre o conceito de felicidade;
+* `navio_de_teseu.ms` – reflexão sobre identidade e mudança;
+* `verificador_de_primos.ms` – exemplo aritmético lógico (verificar números primos).
+
+Use-os para:
+
+* entender a sintaxe;
+* testar o compilador + VM;
+* servir de base para novos roteiros.
+
+Exemplo de compilação + execução de um exemplo:
+
+```bash
+cd src/compiler
+./maieutic ../../examples/felicidade.ms
+
+cd ../vm
+python3 socraticvm.py ../../examples/felicidade.asm
+```
+
+---
+
+## 7. Testes do compilador e da VM
+
+### 7.1 Testes do compilador
+
+No diretório `tests/compiler/`:
+
+* Arquivos de entrada Maiêutic:
+  `geral1.ms`, `geral2.ms`, `input.ms`, `listas.ms`, `loop.ms`, etc.
+* Diretório `outputs/` com assemblies **esperados** para alguns testes.
+
+Fluxo típico de teste manual:
+
+```bash
+cd src/compiler
+
+# compila o fonte de teste
+./maieutic ../../tests/compiler/geral1.ms ../../outputs/geral1_novo.asm
+
+# compara o assembly gerado com o esperado
+diff ../../tests/compiler/outputs/geral1.asm ../../outputs/geral1_novo.asm
+```
+
+Se o `diff` não mostrar diferenças, o compilador está gerando o assembly esperado.
+
+### 7.2 Testes da VM
+
+A validação da execução é feita combinando dois diretórios:
+
+* `src/tests/vm/` – contém os programas em assembly já prontos para teste:
+  `condicional.asm`, `geral1.asm`, `geral2.asm`, `input.asm`, `listas.asm`, `loop.asm`, etc.
+* `src/tests/outputs/` – contém arquivos texto (`condicional`, `geral1`, `geral2`, `input`, `listas`, `loop`, …) com a **especificação de entrada e a saída esperada** para cada caso de teste.
+
+Para rodar um teste da VM:
+
+```bash
+cd src/vm
+python3 socraticvm.py ../../src/tests/vm/geral1.asm
+```
+
+Em seguida, compare o diálogo produzido pela VM (perguntas, respostas, logs, conclusões) com o conteúdo do arquivo correspondente em `src/tests/outputs/geral1`, que descreve quais entradas fornecer e qual saída é esperada para o teste `geral1`.
+
+---
+
+## 8. Próximos passos / contribuições
+
+Algumas possibilidades de evolução:
+
+* Adicionar novas construções de linguagem (funções, módulos, etc.).
+* Refatorar e expandir os testes automatizados (tanto do compilador quanto da VM).
+* Extender a SocraticVM com novas instruções e sensores.
+* Escrever mais roteiros exemplo explorando outros temas filosóficos ou de estudo.
