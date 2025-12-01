@@ -98,7 +98,6 @@ public:
             out << "PUSH_STR \"" << escapeString(val.strVal) << "\"\n";
             break;
         case Value::LIST:
-            // Poderia serializar a lista inteira; por simplicidade, empurramos NIL.
             out << "; TODO: literal de lista pré-avaliada\n";
             out << "PUSH_NIL\n";
             break;
@@ -337,7 +336,7 @@ public:
         if (prefix == ">>") {
             out << "PRINT\n";
         } else if (prefix == "!") {
-            out << "PRINT_CONCL\n"; // pode ser só PRINT, depende da sua VM
+            out << "PRINT_CONCL\n";
         } else {
             out << "PRINT\n";
         }
